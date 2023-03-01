@@ -209,10 +209,11 @@ class GuildMessageCreateEvent(MessageCreateEvent):
             The guild that this event occurred in, if cached. Otherwise,
             `None` instead.
         """
-        if not isinstance(self.app, traits.CacheAware):
-            return None
-
-        return self.app.cache.get_guild(self.guild_id)
+        return (
+            self.app.cache.get_guild(self.guild_id)
+            if isinstance(self.app, traits.CacheAware)
+            else None
+        )
 
     def get_member(self) -> typing.Optional[guilds.Member]:
         """Get the member that sent this message from the cache if available.
@@ -446,10 +447,11 @@ class GuildMessageUpdateEvent(MessageUpdateEvent):
             The guild that this event occurred in, if cached. Otherwise,
             `None` instead.
         """
-        if not isinstance(self.app, traits.CacheAware):
-            return None
-
-        return self.app.cache.get_guild(self.guild_id)
+        return (
+            self.app.cache.get_guild(self.guild_id)
+            if isinstance(self.app, traits.CacheAware)
+            else None
+        )
 
 
 @attr_extensions.with_copy
@@ -561,10 +563,11 @@ class GuildMessageDeleteEvent(MessageDeleteEvent):
             The gateway guild that this event corresponds to, if known and
             cached.
         """
-        if not isinstance(self.app, traits.CacheAware):
-            return None
-
-        return self.app.cache.get_guild(self.guild_id)
+        return (
+            self.app.cache.get_guild(self.guild_id)
+            if isinstance(self.app, traits.CacheAware)
+            else None
+        )
 
 
 @attr_extensions.with_copy
@@ -657,7 +660,8 @@ class GuildBulkMessageDeleteEvent(shard_events.ShardEvent):
             The gateway guild that this event corresponds to, if known and
             cached.
         """
-        if not isinstance(self.app, traits.CacheAware):
-            return None
-
-        return self.app.cache.get_guild(self.guild_id)
+        return (
+            self.app.cache.get_guild(self.guild_id)
+            if isinstance(self.app, traits.CacheAware)
+            else None
+        )

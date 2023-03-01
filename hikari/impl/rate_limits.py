@@ -340,9 +340,7 @@ class WindowedBurstRateLimiter(BurstRateLimiter):
             The time left to sleep before the rate limit is reset. If no rate limit
             is in effect, then this will return `0.0` instead.
         """
-        if not self.is_rate_limited(now):
-            return 0.0
-        return self.reset_at - now
+        return self.reset_at - now if self.is_rate_limited(now) else 0.0
 
     def is_rate_limited(self, now: float) -> bool:
         """Determine if we are under a rate limit at the given time.
@@ -471,9 +469,9 @@ class ExponentialBackOff:
         # (most notably floats have a system based maximum size whereas integers theoretically don't with implicit
         # conversion to a float raising an error if an integer that's too big to be a float is handled).
         try:
-            self.base = float(base)
-            self.maximum = float(maximum)
-            self.jitter_multiplier = float(jitter_multiplier)
+            self.base = base
+            self.maximum = maximum
+            self.jitter_multiplier = jitter_multiplier
         except OverflowError:
             raise ValueError("int too large to be represented as a float") from None
 

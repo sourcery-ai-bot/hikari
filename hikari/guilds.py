@@ -506,10 +506,11 @@ class Member(users.User):
         typing.Optional[hikari.guilds.Guild]
             The linked guild object or `None` if it's not cached.
         """
-        if not isinstance(self.user.app, traits.CacheAware):
-            return None
-
-        return self.user.app.cache.get_guild(self.guild_id)
+        return (
+            self.user.app.cache.get_guild(self.guild_id)
+            if isinstance(self.user.app, traits.CacheAware)
+            else None
+        )
 
     def get_presence(self) -> typing.Optional[presences_.MemberPresence]:
         """Get the cached presence for this member, if known.
@@ -523,10 +524,11 @@ class Member(users.User):
         typing.Optional[hikari.presences.MemberPresence]
             The member presence, or `None` if not known.
         """
-        if not isinstance(self.user.app, traits.CacheAware):
-            return None
-
-        return self.user.app.cache.get_presence(self.guild_id, self.user.id)
+        return (
+            self.user.app.cache.get_presence(self.guild_id, self.user.id)
+            if isinstance(self.user.app, traits.CacheAware)
+            else None
+        )
 
     def get_roles(self) -> typing.Sequence[Role]:
         """Return the roles the user has.
@@ -610,11 +612,7 @@ class Member(users.User):
             return None
 
         if ext is None:
-            if self.guild_avatar_hash.startswith("a_"):
-                ext = "gif"
-            else:
-                ext = "png"
-
+            ext = "gif" if self.guild_avatar_hash.startswith("a_") else "png"
         return routes.CDN_MEMBER_AVATAR.compile_to_file(
             urls.CDN_URL,
             guild_id=self.guild_id,
@@ -1455,11 +1453,7 @@ class PartialGuild(snowflakes.Unique):
             return None
 
         if ext is None:
-            if self.icon_hash.startswith("a_"):
-                ext = "gif"
-            else:
-                ext = "png"
-
+            ext = "gif" if self.icon_hash.startswith("a_") else "png"
         return routes.CDN_GUILD_ICON.compile_to_file(
             urls.CDN_URL,
             guild_id=self.id,
@@ -2955,10 +2949,11 @@ class Guild(PartialGuild):
         typing.Mapping[hikari.snowflakes.Snowflake, Member]
             A mapping of user IDs to objects of the members cached for the guild.
         """
-        if not isinstance(self.app, traits.CacheAware):
-            return {}
-
-        return self.app.cache.get_members_view_for_guild(self.id)
+        return (
+            self.app.cache.get_members_view_for_guild(self.id)
+            if isinstance(self.app, traits.CacheAware)
+            else {}
+        )
 
     def get_presences(self) -> typing.Mapping[snowflakes.Snowflake, presences_.MemberPresence]:
         """Get the presences cached for the guild.
@@ -2969,10 +2964,11 @@ class Guild(PartialGuild):
             A mapping of user IDs to objects of the presences cached for the
             guild.
         """
-        if not isinstance(self.app, traits.CacheAware):
-            return {}
-
-        return self.app.cache.get_presences_view_for_guild(self.id)
+        return (
+            self.app.cache.get_presences_view_for_guild(self.id)
+            if isinstance(self.app, traits.CacheAware)
+            else {}
+        )
 
     def get_channels(self) -> typing.Mapping[snowflakes.Snowflake, channels_.PermissibleGuildChannel]:
         """Get the channels cached for the guild.
@@ -2983,10 +2979,11 @@ class Guild(PartialGuild):
             A mapping of channel IDs to objects of the channels cached for the
             guild.
         """
-        if not isinstance(self.app, traits.CacheAware):
-            return {}
-
-        return self.app.cache.get_guild_channels_view_for_guild(self.id)
+        return (
+            self.app.cache.get_guild_channels_view_for_guild(self.id)
+            if isinstance(self.app, traits.CacheAware)
+            else {}
+        )
 
     def get_voice_states(self) -> typing.Mapping[snowflakes.Snowflake, voices_.VoiceState]:
         """Get the voice states cached for the guild.
@@ -2997,10 +2994,11 @@ class Guild(PartialGuild):
             A mapping of user IDs to objects of the voice states cached for the
             guild.
         """
-        if not isinstance(self.app, traits.CacheAware):
-            return {}
-
-        return self.app.cache.get_voice_states_view_for_guild(self.id)
+        return (
+            self.app.cache.get_voice_states_view_for_guild(self.id)
+            if isinstance(self.app, traits.CacheAware)
+            else {}
+        )
 
     def get_emojis(self) -> typing.Mapping[snowflakes.Snowflake, emojis_.KnownCustomEmoji]:
         """Return the emojis in this guild.
@@ -3010,10 +3008,11 @@ class Guild(PartialGuild):
         typing.Mapping[hikari.snowflakes.Snowflake, hikari.emojis.KnownCustomEmoji]
             A mapping of emoji IDs to the objects of emojis in this guild.
         """
-        if not isinstance(self.app, traits.CacheAware):
-            return {}
-
-        return self.app.cache.get_emojis_view_for_guild(self.id)
+        return (
+            self.app.cache.get_emojis_view_for_guild(self.id)
+            if isinstance(self.app, traits.CacheAware)
+            else {}
+        )
 
     def get_stickers(self) -> typing.Mapping[snowflakes.Snowflake, stickers.GuildSticker]:
         """Return the stickers in this guild.
@@ -3023,10 +3022,11 @@ class Guild(PartialGuild):
         typing.Mapping[hikari.snowflakes.Snowflake, hikari.stickers.GuildSticker]
             A mapping of sticker IDs to the objects of sticker in this guild.
         """
-        if not isinstance(self.app, traits.CacheAware):
-            return {}
-
-        return self.app.cache.get_stickers_view_for_guild(self.id)
+        return (
+            self.app.cache.get_stickers_view_for_guild(self.id)
+            if isinstance(self.app, traits.CacheAware)
+            else {}
+        )
 
     def get_roles(self) -> typing.Mapping[snowflakes.Snowflake, Role]:
         """Return the roles in this guild.
@@ -3036,10 +3036,11 @@ class Guild(PartialGuild):
         typing.Mapping[hikari.snowflakes.Snowflake, Role]
             A mapping of role IDs to the objects of roles in this guild.
         """
-        if not isinstance(self.app, traits.CacheAware):
-            return {}
-
-        return self.app.cache.get_roles_view_for_guild(self.id)
+        return (
+            self.app.cache.get_roles_view_for_guild(self.id)
+            if isinstance(self.app, traits.CacheAware)
+            else {}
+        )
 
     def make_banner_url(self, *, ext: typing.Optional[str] = None, size: int = 4096) -> typing.Optional[files.URL]:
         """Generate the guild's banner image URL, if set.
@@ -3071,12 +3072,7 @@ class Guild(PartialGuild):
             return None
 
         if ext is None:
-            if self.banner_hash.startswith("a_"):
-                ext = "gif"
-
-            else:
-                ext = "png"
-
+            ext = "gif" if self.banner_hash.startswith("a_") else "png"
         return routes.CDN_GUILD_BANNER.compile_to_file(
             urls.CDN_URL,
             guild_id=self.id,
@@ -3167,10 +3163,11 @@ class Guild(PartialGuild):
         typing.Optional[hikari.channels.GuildChannel]
             The object of the guild channel found in cache or `None`.
         """
-        if not isinstance(self.app, traits.CacheAware):
-            return None
-
-        return self.app.cache.get_guild_channel(channel)
+        return (
+            self.app.cache.get_guild_channel(channel)
+            if isinstance(self.app, traits.CacheAware)
+            else None
+        )
 
     def get_member(self, user: snowflakes.SnowflakeishOr[users.PartialUser]) -> typing.Optional[Member]:
         """Get a cached member that belongs to the guild by it's user ID or object.
@@ -3185,10 +3182,11 @@ class Guild(PartialGuild):
         typing.Optional[Member]
             The cached member object if found, else `None`.
         """
-        if not isinstance(self.app, traits.CacheAware):
-            return None
-
-        return self.app.cache.get_member(self.id, user)
+        return (
+            self.app.cache.get_member(self.id, user)
+            if isinstance(self.app, traits.CacheAware)
+            else None
+        )
 
     def get_my_member(self) -> typing.Optional[Member]:
         """Return the cached member for the bot user in this guild, if known.
@@ -3202,10 +3200,7 @@ class Guild(PartialGuild):
             return None
 
         me = self.app.get_me()
-        if me is None:
-            return None
-
-        return self.get_member(me.id)
+        return None if me is None else self.get_member(me.id)
 
     def get_presence(
         self, user: snowflakes.SnowflakeishOr[users.PartialUser]
@@ -3222,10 +3217,11 @@ class Guild(PartialGuild):
         typing.Optional[hikari.presences.MemberPresence]
             The cached presence object if found, else `None`.
         """
-        if not isinstance(self.app, traits.CacheAware):
-            return None
-
-        return self.app.cache.get_presence(self.id, user)
+        return (
+            self.app.cache.get_presence(self.id, user)
+            if isinstance(self.app, traits.CacheAware)
+            else None
+        )
 
     def get_voice_state(
         self, user: snowflakes.SnowflakeishOr[users.PartialUser]
@@ -3242,10 +3238,11 @@ class Guild(PartialGuild):
         typing.Optional[hikari.voices.VoiceState]
             The cached voice state object if found, else `None`.
         """
-        if not isinstance(self.app, traits.CacheAware):
-            return None
-
-        return self.app.cache.get_voice_state(self.id, user)
+        return (
+            self.app.cache.get_voice_state(self.id, user)
+            if isinstance(self.app, traits.CacheAware)
+            else None
+        )
 
     def get_emoji(
         self, emoji: snowflakes.SnowflakeishOr[emojis_.CustomEmoji]
@@ -3263,10 +3260,11 @@ class Guild(PartialGuild):
             The object of the custom emoji if found in cache, else
             `None`.
         """
-        if not isinstance(self.app, traits.CacheAware):
-            return None
-
-        return self.app.cache.get_emoji(emoji)
+        return (
+            self.app.cache.get_emoji(emoji)
+            if isinstance(self.app, traits.CacheAware)
+            else None
+        )
 
     def get_sticker(
         self, sticker: snowflakes.SnowflakeishOr[stickers.GuildSticker]
@@ -3284,10 +3282,11 @@ class Guild(PartialGuild):
             The object of the sticker if found in cache, else
             `None`.
         """
-        if not isinstance(self.app, traits.CacheAware):
-            return None
-
-        return self.app.cache.get_sticker(sticker)
+        return (
+            self.app.cache.get_sticker(sticker)
+            if isinstance(self.app, traits.CacheAware)
+            else None
+        )
 
     def get_role(self, role: snowflakes.SnowflakeishOr[PartialRole]) -> typing.Optional[Role]:
         """Get a cached role that belongs to the guild by it's ID or object.
@@ -3302,10 +3301,11 @@ class Guild(PartialGuild):
         typing.Optional[Role]
             The object of the role found in cache, else `None`.
         """
-        if not isinstance(self.app, traits.CacheAware):
-            return None
-
-        return self.app.cache.get_role(role)
+        return (
+            self.app.cache.get_role(role)
+            if isinstance(self.app, traits.CacheAware)
+            else None
+        )
 
     async def fetch_owner(self) -> Member:
         """Fetch the owner of the guild.

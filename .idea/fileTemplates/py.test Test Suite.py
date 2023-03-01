@@ -24,7 +24,7 @@ import pytest
 
 
 def test_placeholder():
-    assert 1 + 1 == 2
+    pass
 
 
 @pytest.mark.asyncio

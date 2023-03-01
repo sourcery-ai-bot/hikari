@@ -61,7 +61,7 @@ def generate_stubs(session: nox.Session) -> None:
 def _generate_stubs(session: nox.Session) -> None:
     session.run("stubgen", *STUBGEN_GENERATE, "-o", ".", "--include-private", "--no-import")
 
-    stub_paths = [path + "i" for path in STUBGEN_GENERATE]
+    stub_paths = [f"{path}i" for path in STUBGEN_GENERATE]
 
     session.run("isort", *stub_paths)
     session.run("black", *stub_paths)

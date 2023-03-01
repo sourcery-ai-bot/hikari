@@ -147,7 +147,7 @@ class TestRESTBucketManager:
 
         bucket_manager.close()
 
-        assert bucket_manager._real_hashes_to_buckets == {}
+        assert not bucket_manager._real_hashes_to_buckets
 
         for i, b in enumerate(buckets_array):
             b.close.assert_called_once(), i
@@ -172,10 +172,8 @@ class TestRESTBucketManager:
 
         # cancel created task
         bucket_manager._gc_task.cancel()
-        try:
+        with contextlib.suppress(asyncio.CancelledError):
             await bucket_manager._gc_task
-        except asyncio.CancelledError:
-            pass
 
     @pytest.mark.asyncio()
     async def test_start_when_already_started(self, bucket_manager):
@@ -300,7 +298,9 @@ class TestRESTBucketManager:
     @pytest.mark.asyncio()
     async def test_acquire_route_when_not_in_routes_to_real_hashes_doesnt_cache_route(self, bucket_manager):
         route = mock.Mock()
-        route.create_real_bucket_hash = mock.Mock(wraps=lambda initial_hash, auth: initial_hash + ";" + auth + ";bobs")
+        route.create_real_bucket_hash = mock.Mock(
+            wraps=lambda initial_hash, auth: f"{initial_hash};{auth};bobs"
+        )
 
         bucket_manager.acquire_bucket(route, "auth")
 
@@ -325,7 +325,7 @@ class TestRESTBucketManager:
         bucket = mock.Mock(reset_at=time.perf_counter() + 999999999999999999999999999)
         with mock.patch.object(buckets, "RESTBucket", return_value=bucket):
             route.create_real_bucket_hash = mock.Mock(
-                wraps=lambda initial_hash, auth: initial_hash + ";" + auth + ";bobs"
+                wraps=lambda initial_hash, auth: f"{initial_hash};{auth};bobs"
             )
 
             assert bucket_manager.acquire_bucket(route, "auth") is bucket
@@ -343,7 +343,9 @@ class TestRESTBucketManager:
     @pytest.mark.asyncio()
     async def test_update_rate_limits_if_wrong_bucket_hash_reroutes_route(self, bucket_manager):
         route = mock.Mock()
-        route.create_real_bucket_hash = mock.Mock(wraps=lambda initial_hash, auth: initial_hash + ";" + auth + ";bobs")
+        route.create_real_bucket_hash = mock.Mock(
+            wraps=lambda initial_hash, auth: f"{initial_hash};{auth};bobs"
+        )
         bucket_manager._routes_to_hashes[route.route] = "123"
 
         with mock.patch.object(buckets, "_create_authentication_hash", return_value="auth_hash"):
@@ -358,7 +360,9 @@ class TestRESTBucketManager:
     @pytest.mark.asyncio()
     async def test_update_rate_limits_if_unknown_bucket_hash_reroutes_route(self, bucket_manager):
         route = mock.Mock()
-        route.create_real_bucket_hash = mock.Mock(wraps=lambda initial_hash, auth: initial_hash + ";" + auth + ";bobs")
+        route.create_real_bucket_hash = mock.Mock(
+            wraps=lambda initial_hash, auth: f"{initial_hash};{auth};bobs"
+        )
         bucket_manager._routes_to_hashes[route.route] = "123"
         bucket = mock.Mock()
         bucket_manager._real_hashes_to_buckets["UNKNOWN;auth_hash;bobs"] = bucket
@@ -385,7 +389,9 @@ class TestRESTBucketManager:
     @pytest.mark.asyncio()
     async def test_update_rate_limits_if_right_bucket_hash_does_nothing_to_hash(self, bucket_manager):
         route = mock.Mock()
-        route.create_real_bucket_hash = mock.Mock(wraps=lambda initial_hash, auth: initial_hash + ";" + auth + ";bobs")
+        route.create_real_bucket_hash = mock.Mock(
+            wraps=lambda initial_hash, auth: f"{initial_hash};{auth};bobs"
+        )
         bucket_manager._routes_to_hashes[route.route] = "123"
         bucket = mock.Mock(reset_at=time.perf_counter() + 999999999999999999999999999)
         bucket_manager._real_hashes_to_buckets["123;auth_hash;bobs"] = bucket
@@ -401,7 +407,9 @@ class TestRESTBucketManager:
     @pytest.mark.asyncio()
     async def test_update_rate_limits_updates_params(self, bucket_manager):
         route = mock.Mock()
-        route.create_real_bucket_hash = mock.Mock(wraps=lambda initial_hash, auth: initial_hash + ";" + auth + ";bobs")
+        route.create_real_bucket_hash = mock.Mock(
+            wraps=lambda initial_hash, auth: f"{initial_hash};{auth};bobs"
+        )
         bucket_manager._routes_to_hashes[route.route] = "123"
         bucket = mock.Mock(reset_at=time.perf_counter() + 999999999999999999999999999)
         bucket_manager._real_hashes_to_buckets["123;auth_hash;bobs"] = bucket

@@ -35,7 +35,7 @@ class TestUndefined:
         assert str(undefined.UNDEFINED) == "UNDEFINED"
 
     def test_bool(self):
-        assert bool(undefined.UNDEFINED) is False
+        assert not bool(undefined.UNDEFINED)
 
     def test_singleton_behaviour(self):
         assert undefined.UNDEFINED is undefined.UNDEFINED

@@ -20,6 +20,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 """Configuration file for the Sphinx documentation builder."""
+
 import os
 import pathlib
 import re
@@ -27,9 +28,7 @@ import types
 
 # -- Project information -----------------------------------------------------
 
-with open(os.path.join("..", "hikari", "_about.py")) as fp:
-    code = fp.read()
-
+code = pathlib.Path(os.path.join("..", "hikari", "_about.py")).read_text()
 token_pattern = re.compile(r"^__(?P<key>\w+)?__.*=\s*(?P<quote>(?:'{3}|\"{3}|'|\"))(?P<value>.*?)(?P=quote)", re.M)
 
 groups = {}

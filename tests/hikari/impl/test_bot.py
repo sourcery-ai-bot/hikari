@@ -455,7 +455,7 @@ class TestGatewayBot:
         )
 
         # Clear out maps
-        assert bot._shards == {}
+        assert not bot._shards
         cache.clear.assert_called_once_with()
 
         event_manager.dispatch.assert_has_calls(
@@ -1005,7 +1005,7 @@ class TestGatewayBot:
                     url="https://some.website",
                 )
 
-        assert bot._shards == {}
+        assert not bot._shards
         shard_obj.close.assert_not_called()
 
     @pytest.mark.parametrize("is_alive", [True, False])
@@ -1033,7 +1033,7 @@ class TestGatewayBot:
                     url="https://some.website",
                 )
 
-        assert bot._shards == {}
+        assert not bot._shards
 
         if is_alive:
             shard_obj.close.assert_awaited_once_with()

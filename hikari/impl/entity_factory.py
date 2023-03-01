@@ -2664,10 +2664,10 @@ class EntityFactoryImpl(entity_factory.EntityFactory):
     ##################
 
     def deserialize_sticker_pack(self, payload: data_binding.JSONObject) -> sticker_models.StickerPack:
-        pack_stickers: typing.List[sticker_models.StandardSticker] = []
-        for sticker_payload in payload["stickers"]:
-            pack_stickers.append(self.deserialize_standard_sticker(sticker_payload))
-
+        pack_stickers: typing.List[sticker_models.StandardSticker] = [
+            self.deserialize_standard_sticker(sticker_payload)
+            for sticker_payload in payload["stickers"]
+        ]
         return sticker_models.StickerPack(
             id=snowflakes.Snowflake(payload["id"]),
             name=payload["name"],

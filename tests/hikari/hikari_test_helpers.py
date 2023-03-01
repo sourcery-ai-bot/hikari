@@ -54,7 +54,7 @@ def mock_class_namespace(
     if slots_ or slots_ is None and hasattr(klass, "__slots__"):
         namespace["__slots__"] = ()
 
-    if init_ is False:
+    if not init_:
         namespace["__init__"] = lambda _: None
 
     if implement_abstract_methods_ and hasattr(klass, "__abstractmethods__"):
@@ -73,10 +73,10 @@ def mock_class_namespace(
             else:
                 namespace[method_name] = mock.Mock(spec_set=attr, __isabstractmethod__=False)
 
-    for attribute in namespace.keys():
+    for attribute in namespace:
         assert hasattr(klass, attribute), f"invalid namespace attribute {attribute!r} provided"
 
-    name = "Mock" + klass.__name__ if rename_impl_ else klass.__name__
+    name = f"Mock{klass.__name__}" if rename_impl_ else klass.__name__
 
     return type(name, (klass,), namespace)
 

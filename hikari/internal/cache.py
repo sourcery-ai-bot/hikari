@@ -133,10 +133,7 @@ class CacheMappingView(cache.CacheView[KeyT, ValueT]):
     def __getitem__(self, key: KeyT) -> ValueT:
         entry = self._data[key]
 
-        if self._builder:
-            return self._builder(entry)  # type: ignore[arg-type]
-
-        return self._copy(entry)  # type: ignore[arg-type]
+        return self._builder(entry) if self._builder else self._copy(entry)
 
     def __iter__(self) -> typing.Iterator[KeyT]:
         return iter(self._data)

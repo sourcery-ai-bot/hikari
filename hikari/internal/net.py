@@ -108,7 +108,7 @@ def create_tcp_connector(
         force_close=http_settings.force_close_transports,
         limit=limit,
         ssl=http_settings.ssl,
-        ttl_dns_cache=dns_cache if not isinstance(dns_cache, bool) else 10,
+        ttl_dns_cache=10 if isinstance(dns_cache, bool) else dns_cache,
         use_dns_cache=dns_cache is not False,
     )
 

@@ -160,7 +160,7 @@ class TestVoiceComponentImpl:
 
         voice_client.start()
 
-        assert voice_client._is_alive is True
+        assert voice_client._is_alive
 
     @pytest.mark.asyncio()
     async def test_start_when_already_alive(self, voice_client, mock_app):

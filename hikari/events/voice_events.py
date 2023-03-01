@@ -130,7 +130,4 @@ class VoiceServerUpdateEvent(VoiceEvent):
         and you have to disconnect. You will later receive a new event specifying
         what endpoint to connect to.
         """
-        if self.raw_endpoint is None:
-            return None
-
-        return f"wss://{self.raw_endpoint}"
+        return None if self.raw_endpoint is None else f"wss://{self.raw_endpoint}"

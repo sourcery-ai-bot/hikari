@@ -31,12 +31,7 @@ async def on_message(event: hikari.GuildMessageCreateEvent) -> None:
     args = event.content[1:].split()
 
     if args[0] == "image":
-        if len(args) == 1:
-            # No more args where provided
-            what = ""
-        else:
-            what = args[1]
-
+        what = "" if len(args) == 1 else args[1]
         # Since uploading can take some time, we give a visual indicator to the user by typing
         async with bot.rest.trigger_typing(event.channel_id):
             await inspect_image(event, what.lstrip())
@@ -46,12 +41,11 @@ async def inspect_image(event: hikari.GuildMessageCreateEvent, what: str) -> Non
     """Inspect the image and respond to the user."""
     # Show the avatar for the given user ID:
     if user_match := re.match(r"<@!?(\d+)>", what):
-        user_id = hikari.Snowflake(user_match.group(1))
+        user_id = hikari.Snowflake(user_match[1])
         user = bot.cache.get_user(user_id) or await bot.rest.fetch_user(user_id)
         await event.message.respond("User avatar", attachment=user.avatar_url or user.default_avatar_url)
 
-    # Show the guild icon:
-    elif what.casefold() in ("guild", "server", "here", "this"):
+    elif what.casefold() in {"guild", "server", "here", "this"}:
         guild = event.get_guild()
         if guild is None:
             await event.message.respond("Guild is missing from the cache :(")
@@ -62,12 +56,10 @@ async def inspect_image(event: hikari.GuildMessageCreateEvent, what: str) -> Non
         else:
             await event.message.respond("Guild icon", attachment=icon_url)
 
-    # Show the image for the given emoji if there is some content present:
     elif what:
         emoji = hikari.Emoji.parse(what)
         await event.message.respond(emoji.name, attachment=emoji)
 
-    # If nothing was given, we should just return the avatar of the person who ran the command:
     else:
         await event.message.respond(
             "Your avatar", attachment=event.author.avatar_url or event.author.default_avatar_url

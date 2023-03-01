@@ -998,10 +998,11 @@ class GuildChannel(PartialChannel):
         typing.Optional[hikari.guilds.Guild]
             The linked guild object or `None` if it's not cached.
         """
-        if not isinstance(self.app, traits.CacheAware):
-            return None
-
-        return self.app.cache.get_guild(self.guild_id)
+        return (
+            self.app.cache.get_guild(self.guild_id)
+            if isinstance(self.app, traits.CacheAware)
+            else None
+        )
 
     async def fetch_guild(self) -> guilds.PartialGuild:
         """Fetch the guild linked to this channel.

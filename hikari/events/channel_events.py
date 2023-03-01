@@ -145,10 +145,12 @@ class GuildChannelEvent(ChannelEvent, abc.ABC):
             The gateway guild this event relates to, if known. Otherwise
             this will return `None`.
         """
-        if not isinstance(self.app, traits.CacheAware):
-            return None
-
-        return self.app.cache.get_available_guild(self.guild_id) or self.app.cache.get_unavailable_guild(self.guild_id)
+        return (
+            self.app.cache.get_available_guild(self.guild_id)
+            or self.app.cache.get_unavailable_guild(self.guild_id)
+            if isinstance(self.app, traits.CacheAware)
+            else None
+        )
 
     async def fetch_guild(self) -> guilds.RESTGuild:
         """Perform an API call to fetch the guild that this event relates to.
@@ -193,10 +195,11 @@ class GuildChannelEvent(ChannelEvent, abc.ABC):
             The cached channel this event relates to. If not known, this
             will return `None` instead.
         """
-        if not isinstance(self.app, traits.CacheAware):
-            return None
-
-        return self.app.cache.get_guild_channel(self.channel_id)
+        return (
+            self.app.cache.get_guild_channel(self.channel_id)
+            if isinstance(self.app, traits.CacheAware)
+            else None
+        )
 
     async def fetch_channel(self) -> channels.GuildChannel:
         """Perform an API call to fetch the details about this channel.

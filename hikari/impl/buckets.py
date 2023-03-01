@@ -349,7 +349,7 @@ def _create_authentication_hash(authentication: typing.Optional[str]) -> str:
 
 
 def _create_unknown_hash(route: routes.CompiledRoute, authentication_hash: str) -> str:
-    return f"{UNKNOWN_HASH}{routes.HASH_SEPARATOR}{authentication_hash}{routes.HASH_SEPARATOR}{str(hash(route))}"
+    return f"{UNKNOWN_HASH}{routes.HASH_SEPARATOR}{authentication_hash}{routes.HASH_SEPARATOR}{hash(route)}"
 
 
 class RESTBucketManager:

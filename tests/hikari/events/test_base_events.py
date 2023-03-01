@@ -77,7 +77,7 @@ def test_is_no_recursive_throw_event_marked():
 def test_requires_intents():
     assert list(base_events.get_required_intents_for(DummyGuildEvent)) == [intents.Intents.GUILDS]
     assert list(base_events.get_required_intents_for(DummyPresenceEvent)) == [intents.Intents.GUILD_PRESENCES]
-    assert list(base_events.get_required_intents_for(ErrorEvent)) == []
+    assert not list(base_events.get_required_intents_for(ErrorEvent))
 
 
 def test_inherited_requires_intents():

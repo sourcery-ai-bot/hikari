@@ -220,9 +220,7 @@ class ExceptionEvent(Event, typing.Generic[EventT]):
         exception (e.g. when starting up or shutting down).
         """
         shard = getattr(self.failed_event, "shard", None)
-        if isinstance(shard, gateway_shard.GatewayShard):
-            return shard
-        return None
+        return shard if isinstance(shard, gateway_shard.GatewayShard) else None
 
     @property
     def exc_info(self) -> typing.Tuple[typing.Type[Exception], Exception, typing.Optional[types.TracebackType]]:

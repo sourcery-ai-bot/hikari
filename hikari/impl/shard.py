@@ -213,7 +213,7 @@ class _GatewayTransport:
             can_reconnect = close_code < 4000 or close_code in _RECONNECTABLE_CLOSE_CODES
             raise errors.GatewayServerClosedConnectionError(message.extra, close_code, can_reconnect)
 
-        if message.type == aiohttp.WSMsgType.CLOSING or message.type == aiohttp.WSMsgType.CLOSED:
+        if message.type in [aiohttp.WSMsgType.CLOSING, aiohttp.WSMsgType.CLOSED]:
             # May be caused by the server shutting us down.
             # May be caused by Windows injecting an EOF if something disconnects, as some
             # network drivers appear to do this.
@@ -332,10 +332,7 @@ class _GatewayTransport:
 
 
 def _serialize_datetime(dt: typing.Optional[datetime.datetime]) -> typing.Optional[int]:
-    if dt is None:
-        return None
-
-    return int(dt.timestamp() * 1_000)
+    return None if dt is None else int(dt.timestamp() * 1_000)
 
 
 def _serialize_activity(activity: typing.Optional[presences.Activity]) -> data_binding.JSONish:
@@ -534,11 +531,8 @@ class GatewayShardImpl(shard.GatewayShard):
         self._is_closing = True
 
         self._keep_alive_task.cancel()
-        try:
+        with contextlib.suppress(asyncio.CancelledError):
             await self._keep_alive_task
-        except asyncio.CancelledError:
-            pass
-
         self._keep_alive_task = None
         self._non_priority_rate_limit.close()
         self._total_rate_limit.close()
@@ -921,11 +915,8 @@ class GatewayShardImpl(shard.GatewayShard):
                     if not task.done() and not task.cancelled():
                         task.cancel()
 
-                        try:
+                        with contextlib.suppress(asyncio.CancelledError):
                             await task
-                        except asyncio.CancelledError:
-                            pass
-
                 # Close the ws
                 if self._ws:
                     ws = self._ws

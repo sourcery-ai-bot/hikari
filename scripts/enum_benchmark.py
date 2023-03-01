@@ -86,8 +86,8 @@ class BasicHikariEnum(str, hikari_enum.Enum):
 
 
 # Dummy work to churn the CPU up.
-for i in range(100_000):
-    assert sum(i for i in range(10)) > 0
+for _ in range(100_000):
+    assert sum(range(10)) > 0
 
 py_enum_call_time = timeit.timeit("BasicPyEnum('25')", number=1_000_000, globals=globals())
 hikari_enum_call_time = timeit.timeit("BasicHikariEnum('25')", number=1_000_000, globals=globals())

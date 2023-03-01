@@ -91,7 +91,7 @@ class TestConsumeGeneratorListener:
 
         await interaction_server_impl._consume_generator_listener(generator)
 
-        assert g_continued is True
+        assert g_continued
 
     async def test_when_more_than_one_yield(self):
         async def mock_generator_listener():
@@ -112,7 +112,7 @@ class TestConsumeGeneratorListener:
         with mock.patch.object(asyncio, "get_running_loop", return_value=loop):
             await interaction_server_impl._consume_generator_listener(generator)
 
-        assert g_continued is True
+        assert g_continued
         args, _ = loop.call_exception_handler.call_args_list[0]
         exception = args[0]["exception"]
         assert isinstance(exception, RuntimeError)
@@ -138,7 +138,7 @@ class TestConsumeGeneratorListener:
         with mock.patch.object(asyncio, "get_running_loop", return_value=loop):
             await interaction_server_impl._consume_generator_listener(generator)
 
-        assert g_continued is True
+        assert g_continued
         args, _ = loop.call_exception_handler.call_args_list[0]
         assert args[0]["exception"] is exception
 
@@ -607,8 +607,8 @@ class TestInteractionServer:
         mock_runner.shutdown.assert_awaited_once()
         mock_runner.cleanup.assert_awaited_once()
         mock_event.set.assert_called_once()
-        assert mock_interaction_server._is_closing is False
-        assert mock_interaction_server._running_generator_listeners == []
+        assert not mock_interaction_server._is_closing
+        assert not mock_interaction_server._running_generator_listeners
         gather.assert_awaited_once_with(
             generator_listener_1,
             generator_listener_2,
@@ -727,13 +727,13 @@ class TestInteractionServer:
         assert result.payload == b'{"ok": "No boomer"}'
         assert result.status_code == 200
 
-        assert g_called is True
-        assert g_complete is False
+        assert g_called
+        assert not g_complete
         assert len(mock_interaction_server._running_generator_listeners) != 0
         # Give some time for the task to complete
         await asyncio.sleep(hikari_test_helpers.REASONABLE_QUICK_RESPONSE_TIME)
 
-        assert g_complete is True
+        assert g_complete
         assert len(mock_interaction_server._running_generator_listeners) == 0
 
     @pytest.mark.asyncio()
@@ -1030,7 +1030,7 @@ class TestInteractionServer:
             aiohttp.web.UnixSite.return_value.start.assert_awaited_once()
             aiohttp.web.SockSite.return_value.start.assert_awaited_once()
             assert mock_interaction_server._close_event is asyncio.Event.return_value
-            assert mock_interaction_server._is_closing is False
+            assert not mock_interaction_server._is_closing
 
     @pytest.mark.asyncio()
     async def test_start_with_default_behaviour(

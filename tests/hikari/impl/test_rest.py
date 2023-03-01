@@ -1203,10 +1203,7 @@ class TestRESTClientImpl:
 
     @pytest.mark.parametrize("args", [("embeds", "components"), ("embed", "component")])
     def test__build_message_payload_with_None_args(self, rest_client, args):
-        kwargs = {}
-        for arg in args:
-            kwargs[arg] = None
-
+        kwargs = {arg: None for arg in args}
         with mock.patch.object(
             mentions, "generate_allowed_mentions", return_value={"allowed_mentions": 1}
         ) as generate_allowed_mentions:

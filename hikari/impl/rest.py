@@ -547,11 +547,11 @@ class RESTClientImpl(rest_api.RESTClient):
         if max_retries > 5:
             raise ValueError("'max_retries' must be below or equal to 5")
 
-        if client_session_owner is False and client_session is None:
+        if not client_session_owner and client_session is None:
             raise ValueError(
                 "Cannot delegate ownership of unknown client session [client_session_owner=False, client_session=None]"
             )
-        if bucket_manager_owner is False and bucket_manager is None:
+        if not bucket_manager_owner and bucket_manager is None:
             raise ValueError(
                 "Cannot delegate ownership of unknown bucket manager [bucket_manager_owner=False, bucket_manager=None]"
             )
@@ -1347,18 +1347,17 @@ class RESTClientImpl(rest_api.RESTClient):
             final_attachments.extend(attachments)
 
         serialized_components: undefined.UndefinedOr[typing.List[data_binding.JSONObject]] = undefined.UNDEFINED
-        if component is not undefined.UNDEFINED:
-            if component is not None:
-                serialized_components = [component.build()]
-            else:
-                serialized_components = []
+        if component is not undefined.UNDEFINED and component is not None:
+            serialized_components = [component.build()]
+        elif (
+            component is not undefined.UNDEFINED
+            or components is not undefined.UNDEFINED
+            and components is None
+        ):
+            serialized_components = []
 
         elif components is not undefined.UNDEFINED:
-            if components is not None:
-                serialized_components = [component.build() for component in components]
-            else:
-                serialized_components = []
-
+            serialized_components = [component.build() for component in components]
         serialized_embeds: undefined.UndefinedOr[data_binding.JSONArray] = undefined.UNDEFINED
         if embed is not undefined.UNDEFINED:
             if embed is not None:
@@ -3607,11 +3606,8 @@ class RESTClientImpl(rest_api.RESTClient):
     ) -> typing.List[commands.PartialCommand]:
         command_objs: typing.List[commands.PartialCommand] = []
         for payload in command_payloads:
-            try:
+            with contextlib.suppress(errors.UnrecognisedEntityError):
                 command_objs.append(self._entity_factory.deserialize_command(payload, guild_id=guild_id))
-
-            except errors.UnrecognisedEntityError:
-                pass
 
         return command_objs
 

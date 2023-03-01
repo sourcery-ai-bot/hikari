@@ -94,10 +94,7 @@ class AttrGetter(typing.Generic[InputValueT, ReturnValueT]):
 
         op = self._to_op(attr_name)
 
-        if invert:
-            return lambda value: not op(value)
-
-        return op
+        return (lambda value: not op(value)) if invert else op
 
     @staticmethod
     def _to_op(attr_name: str) -> typing.Callable[[typing.Any], typing.Any]:

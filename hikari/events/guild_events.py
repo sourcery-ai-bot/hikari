@@ -110,10 +110,12 @@ class GuildEvent(shard_events.ShardEvent, abc.ABC):
         typing.Optional[hikari.guilds.GatewayGuild]
             The guild this event relates to, or `None` if not known.
         """
-        if not isinstance(self.app, traits.CacheAware):
-            return None
-
-        return self.app.cache.get_available_guild(self.guild_id) or self.app.cache.get_unavailable_guild(self.guild_id)
+        return (
+            self.app.cache.get_available_guild(self.guild_id)
+            or self.app.cache.get_unavailable_guild(self.guild_id)
+            if isinstance(self.app, traits.CacheAware)
+            else None
+        )
 
 
 @base_events.requires_intents(intents.Intents.GUILDS)
@@ -668,10 +670,11 @@ class PresenceUpdateEvent(shard_events.ShardEvent):
         typing.Optional[hikari.users.User]
             The full cached user, or `None` if not cached.
         """
-        if not isinstance(self.app, traits.CacheAware):
-            return None
-
-        return self.app.cache.get_user(self.user_id)
+        return (
+            self.app.cache.get_user(self.user_id)
+            if isinstance(self.app, traits.CacheAware)
+            else None
+        )
 
     async def fetch_user(self) -> users.User:
         """Perform an API call to fetch the user this event concerns.

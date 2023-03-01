@@ -237,10 +237,12 @@ class GuildTypingEvent(TypingEvent):
         typing.Optional[hikari.guilds.GatewayGuild]
             The object of the gateway guild if found else `None`.
         """
-        if not isinstance(self.app, traits.CacheAware):
-            return None
-
-        return self.app.cache.get_available_guild(self.guild_id) or self.app.cache.get_unavailable_guild(self.guild_id)
+        return (
+            self.app.cache.get_available_guild(self.guild_id)
+            or self.app.cache.get_unavailable_guild(self.guild_id)
+            if isinstance(self.app, traits.CacheAware)
+            else None
+        )
 
 
 @base_events.requires_intents(intents.Intents.DM_MESSAGES)

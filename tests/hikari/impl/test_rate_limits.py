@@ -34,8 +34,6 @@ from tests.hikari import hikari_test_helpers
 
 class MockFuture(mock.Mock):
     def __await__(self):
-        if False:
-            yield  # Turns this into a generator.
         return None
 
 
@@ -70,7 +68,7 @@ class TestBurstRateLimiter:
         futures = [event_loop.create_future() for _ in range(10)]
         mock_burst_limiter.queue = list(futures)
         mock_burst_limiter.close()
-        assert len(mock_burst_limiter.queue) == 0
+        assert not mock_burst_limiter.queue
 
     def test_close_cancels_all_futures_pending_when_futures_pending(self, event_loop, mock_burst_limiter):
         mock_burst_limiter.throttle_task = None
@@ -84,7 +82,6 @@ class TestBurstRateLimiter:
         mock_burst_limiter.throttle_task = None
         mock_burst_limiter.queue = []
         mock_burst_limiter.close()
-        assert True, "passed successfully"
 
     def test_close_cancels_throttle_task_if_running(self, event_loop, mock_burst_limiter):
         task = event_loop.create_future()
@@ -303,7 +300,7 @@ class TestWindowedBurstRateLimiter:
                 old_queue = list(rl.queue)
                 await rl.throttle()
 
-        assert len(rl.queue) == 0
+        assert not rl.queue
         for i, future in enumerate(old_queue):
             assert future.done(), f"future {i} was incomplete!"
 
@@ -336,7 +333,7 @@ class TestWindowedBurstRateLimiter:
             await asyncio.wait(futures, timeout=3)
 
         assert sleep_count == 4
-        assert len(rl.queue) == 0
+        assert not rl.queue
         for i, future in enumerate(futures):
             assert future.done(), f"future {i} was incomplete!"
 

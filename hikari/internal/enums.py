@@ -55,7 +55,7 @@ class _EnumNamespace(typing.Dict[str, typing.Any]):
                 raise KeyError(name) from None
 
     def __setitem__(self, name: str, value: typing.Any) -> None:
-        if name == "" or name == "mro":
+        if name in {"", "mro"}:
             raise TypeError(f"Invalid enum member name: {name!r}")
 
         if name.startswith("_"):
@@ -100,22 +100,22 @@ _Enum = NotImplemented
 
 
 class _EnumMeta(type):
-    def __call__(cls, value: typing.Any) -> typing.Any:
+    def __call__(self, value: typing.Any) -> typing.Any:
         """Cast a value to the enum, returning the raw value that was passed if value not found."""
         try:
-            return cls._value_to_member_map_[value]
+            return self._value_to_member_map_[value]
         except KeyError:
             # If we can't find the value, just return what got casted in
             return value
 
-    def __getitem__(cls, name: str) -> typing.Any:
-        return cls._name_to_member_map_[name]
+    def __getitem__(self, name: str) -> typing.Any:
+        return self._name_to_member_map_[name]
 
-    def __contains__(cls, item: typing.Any) -> bool:
-        return item in cls._value_to_member_map_
+    def __contains__(self, item: typing.Any) -> bool:
+        return item in self._value_to_member_map_
 
-    def __iter__(cls) -> typing.Iterator[typing.Any]:
-        yield from cls._name_to_member_map_.values()
+    def __iter__(self) -> typing.Iterator[typing.Any]:
+        yield from self._name_to_member_map_.values()
 
     def __new__(
         mcs: typing.Type[_T],
@@ -153,7 +153,7 @@ class _EnumMeta(type):
             new_namespace.pop("__str__", None)
 
         # We update the name space to ensure new fields override inherited attributes and methods.
-        new_namespace.update(namespace)
+        new_namespace |= namespace
 
         cls = super().__new__(mcs, name, bases, new_namespace)
 
@@ -174,9 +174,7 @@ class _EnumMeta(type):
         return cls
 
     @classmethod
-    def __prepare__(
-        mcs, name: str, bases: typing.Tuple[typing.Type[typing.Any], ...] = ()
-    ) -> typing.Union[typing.Dict[str, typing.Any], _EnumNamespace]:
+    def __prepare__(cls, name: str, bases: typing.Tuple[typing.Type[typing.Any], ...] = ()) -> typing.Union[typing.Dict[str, typing.Any], _EnumNamespace]:
         if _Enum is NotImplemented:
             if name != "Enum":
                 raise TypeError("First instance of _EnumMeta must be Enum")
@@ -193,8 +191,8 @@ class _EnumMeta(type):
         except ValueError:
             raise TypeError("Expected exactly two base classes for an enum") from None
 
-    def __repr__(cls) -> str:
-        return f"<enum {cls.__name__}>"
+    def __repr__(self) -> str:
+        return f"<enum {self.__name__}>"
 
     __str__ = __repr__
 
@@ -322,22 +320,22 @@ def _name_resolver(members: typing.Dict[int, _Flag], value: int) -> typing.Gener
 
 
 class _FlagMeta(type):
-    def __call__(cls, value: int = 0) -> typing.Any:
+    def __call__(self, value: int = 0) -> typing.Any:
         """Cast a value to the flag enum, returning the raw value that was passed if values not found."""
         # We want to handle value invariantly to avoid issues brought in by different behaviours from sub-classed ints
         # and floats. This also ensures that .__int__ only returns an invariant int.
-        value = int(value)
+        value = value
         try:
-            return cls._value_to_member_map_[value]
+            return self._value_to_member_map_[value]
         except KeyError:
             # We only need this ability here usually, so overloading operators
             # is an overkill and would add more overhead.
 
             if value < 0:
                 # Convert to a positive value instead.
-                return cls.__everything__ - ~value
+                return self.__everything__ - ~value
 
-            temp_members = cls._temp_members_
+            temp_members = self._temp_members_
             # For huge enums, don't ever cache anything. We could consume masses of memory otherwise
             # (e.g. Permissions)
             try:
@@ -346,7 +344,7 @@ class _FlagMeta(type):
             except KeyError:
                 # If we can't find the value, just return what got casted in by generating a pseudomember
                 # and caching it. We can't use weakref because int is not weak referenceable, annoyingly.
-                pseudomember = cls.__new__(cls, value)
+                pseudomember = self.__new__(self, value)
                 pseudomember._name_ = None
                 pseudomember._value_ = value
                 temp_members[value] = pseudomember
@@ -355,16 +353,14 @@ class _FlagMeta(type):
 
                 return pseudomember
 
-    def __getitem__(cls, name: str) -> typing.Any:
-        return cls._name_to_member_map_[name]
+    def __getitem__(self, name: str) -> typing.Any:
+        return self._name_to_member_map_[name]
 
-    def __iter__(cls) -> typing.Iterator[typing.Any]:
-        yield from cls._name_to_member_map_.values()
+    def __iter__(self) -> typing.Iterator[typing.Any]:
+        yield from self._name_to_member_map_.values()
 
     @classmethod
-    def __prepare__(
-        mcs, name: str, bases: typing.Tuple[typing.Type[typing.Any], ...] = ()
-    ) -> typing.Union[typing.Dict[str, typing.Any], _EnumNamespace]:
+    def __prepare__(cls, name: str, bases: typing.Tuple[typing.Type[typing.Any], ...] = ()) -> typing.Union[typing.Dict[str, typing.Any], _EnumNamespace]:
         if _Flag is NotImplemented:
             if name != "Flag":
                 raise TypeError("First instance of _FlagMeta must be Flag")
@@ -415,7 +411,7 @@ class _FlagMeta(type):
             },
         }
         # We update the namespace to ensure new fields override inherited attributes and methods.
-        new_namespace.update(namespace)
+        new_namespace |= namespace
 
         cls = super().__new__(mcs, name, (int, *bases), new_namespace)
 
@@ -444,8 +440,8 @@ class _FlagMeta(type):
 
         return cls
 
-    def __repr__(cls) -> str:
-        return f"<enum {cls.__name__}>"
+    def __repr__(self) -> str:
+        return f"<enum {self.__name__}>"
 
     __str__ = __repr__
 

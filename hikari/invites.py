@@ -210,12 +210,7 @@ class InviteGuild(guilds.PartialGuild):
             return None
 
         if ext is None:
-            if self.banner_hash.startswith("a_"):
-                ext = "gif"
-
-            else:
-                ext = "png"
-
+            ext = "gif" if self.banner_hash.startswith("a_") else "png"
         return routes.CDN_GUILD_BANNER.compile_to_file(
             urls.CDN_URL,
             guild_id=self.id,
@@ -337,7 +332,4 @@ class InviteWithMetadata(Invite):
 
         This will be `None` if the invite has unlimited uses.
         """
-        if self.max_uses:
-            return self.max_uses - self.uses
-
-        return None
+        return self.max_uses - self.uses if self.max_uses else None

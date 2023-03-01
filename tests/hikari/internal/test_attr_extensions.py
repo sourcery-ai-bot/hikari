@@ -31,13 +31,13 @@ from hikari.internal import attr_extensions
 def test_invalidate_shallow_copy_cache():
     attr_extensions._SHALLOW_COPIERS = {int: object(), str: object()}
     assert attr_extensions.invalidate_shallow_copy_cache() is None
-    assert attr_extensions._SHALLOW_COPIERS == {}
+    assert not attr_extensions._SHALLOW_COPIERS
 
 
 def test_invalidate_deep_copy_cache():
     attr_extensions._DEEP_COPIERS = {str: object(), int: object(), object: object()}
     assert attr_extensions.invalidate_deep_copy_cache() is None
-    assert attr_extensions._DEEP_COPIERS == {}
+    assert not attr_extensions._DEEP_COPIERS
 
 
 def test_get_fields_definition():

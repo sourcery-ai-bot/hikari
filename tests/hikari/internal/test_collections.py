@@ -306,19 +306,19 @@ class TestSnowflakeSet:
         assert list(iter(sfs)) == [9, 18, 27, 36, 45, 54, 63]
         assert list(sfs) == [9, 18, 27, 36, 45, 54, 63]
 
-    @pytest.mark.parametrize("items", [*range(0, 10)])
+    @pytest.mark.parametrize("items", [*range(10)])
     def test_len(self, items):
         # given
         sfs = collections.SnowflakeSet()
-        sfs._ids.extend(i for i in range(items))
+        sfs._ids.extend(iter(range(items)))
         # then
         assert len(sfs) == items
 
-    @pytest.mark.parametrize("items", [*range(0, 10)])
+    @pytest.mark.parametrize("items", [*range(10)])
     def test_length_hint(self, items):
         # given
         sfs = collections.SnowflakeSet()
-        sfs._ids.extend(i for i in range(items))
+        sfs._ids.extend(iter(range(items)))
         # then
         assert operator.length_hint(sfs) == items
 

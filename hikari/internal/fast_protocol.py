@@ -91,14 +91,11 @@ class _FastProtocolChecking(type(typing.Protocol)):
         return cls
 
     def __instancecheck__(self: _T, other: typing.Any) -> bool:
-        if not self._is_protocol:
-            return super().__instancecheck__(other)
-
-        for i in self._attributes_:
-            if not hasattr(other, i):
-                return False
-
-        return True
+        return (
+            all(hasattr(other, i) for i in self._attributes_)
+            if self._is_protocol
+            else super().__instancecheck__(other)
+        )
 
 
 @typing.runtime_checkable

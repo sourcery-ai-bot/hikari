@@ -3117,8 +3117,11 @@ class TestEntityFactoryImpl:
     ):
         # While this isn't a legitimate case based on the current behaviour of the API, we still want to cover this
         # to ensure no duplication occurs.
-        member_payload = {**member_payload, "guild_id": "76543325"}
-        member_payload["roles"] = [11111, 22222, 76543325, 33333, 44444]
+        member_payload = {
+            **member_payload,
+            "guild_id": "76543325",
+            "roles": [11111, 22222, 76543325, 33333, 44444],
+        }
         member = entity_factory_impl.deserialize_member(member_payload)
         assert member.app is mock_app
         assert member.guild_id == 76543325

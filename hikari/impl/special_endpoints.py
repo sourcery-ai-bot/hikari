@@ -319,8 +319,8 @@ class GuildBuilder(special_endpoints.GuildBuilder):
         route = routes.POST_GUILDS.compile()
         payload = data_binding.JSONObjectBuilder()
         payload.put("name", self.name)
-        payload.put_array("roles", self._roles if self._roles else undefined.UNDEFINED)
-        payload.put_array("channels", self._channels if self._channels else undefined.UNDEFINED)
+        payload.put_array("roles", self._roles or undefined.UNDEFINED)
+        payload.put_array("channels", self._channels or undefined.UNDEFINED)
         payload.put("verification_level", self.verification_level)
         payload.put("default_message_notifications", self.default_message_notifications)
         payload.put("explicit_content_filter", self.explicit_content_filter_level)
@@ -894,10 +894,7 @@ class GuildThreadIterator(iterators.BufferedLazyIterator[_GuildThreadChannelT]):
 def _maybe_cast(
     callback: typing.Callable[[data_binding.JSONObject], _T], data: typing.Optional[data_binding.JSONObject]
 ) -> typing.Optional[_T]:
-    if data:
-        return callback(data)
-
-    return None
+    return callback(data) if data else None
 
 
 @attr_extensions.with_copy

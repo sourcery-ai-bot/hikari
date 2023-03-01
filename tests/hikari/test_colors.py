@@ -217,10 +217,7 @@ class TestColor:
         with pytest.raises(ValueError, match=r"Expected blue channel to be in the inclusive range of 0 and 255"):
             colors.Color.from_rgb(32, 32, 0x999)
 
-    @pytest.mark.parametrize(
-        ("r", "g", "b", "expected"),
-        [(0x09 / 0xFF, 0x18 / 0xFF, 0x27 / 0xFF, 0x91827), (0x55 / 0xFF, 0x1A / 0xFF, 0xFF / 0xFF, 0x551AFF)],
-    )
+    @pytest.mark.parametrize(("r", "g", "b", "expected"), [(0x09 / 0xFF, 0x18 / 0xFF, 0x27 / 0xFF, 0x91827), (0x55 / 0xFF, 0x1A / 0xFF, 1, 0x551AFF)])
     def test_Color_from_rgb_float(self, r, g, b, expected):
         assert math.isclose(colors.Color.from_rgb_float(r, g, b), expected, abs_tol=1)
 
@@ -240,10 +237,7 @@ class TestColor:
     def test_Color_rgb(self, input, r, g, b):
         assert colors.Color(input).rgb == (r, g, b)
 
-    @pytest.mark.parametrize(
-        ("input", "r", "g", "b"),
-        [(0x91827, 0x09 / 0xFF, 0x18 / 0xFF, 0x27 / 0xFF), (0x551AFF, 0x55 / 0xFF, 0x1A / 0xFF, 0xFF / 0xFF)],
-    )
+    @pytest.mark.parametrize(("input", "r", "g", "b"), [(0x91827, 0x09 / 0xFF, 0x18 / 0xFF, 0x27 / 0xFF), (0x551AFF, 0x55 / 0xFF, 0x1A / 0xFF, 1)])
     def test_Color_rgb_float(self, input, r, g, b):
         assert colors.Color(input).rgb_float == (r, g, b)
 
@@ -295,28 +289,7 @@ class TestColor:
         result = colors.Color.of(input)
         assert result == expected_result, f"{input}"
 
-    @pytest.mark.parametrize(
-        ("input_string", "value_error_match"),
-        [
-            ("blah", r"Could not transform 'blah' into a Color object"),
-            ("0xfff1", r"Color code is invalid length\. Must be 3 or 6 digits"),
-            (lambda: 22, r"Could not transform <function TestColor\.<lambda> at 0x[a-zA-Z0-9]+> into a Color object"),
-            (NotImplementedError, r"Could not transform <class 'NotImplementedError'> into a Color object"),
-            (NotImplemented, r"Could not transform NotImplemented into a Color object"),
-            ((1, 1, 1, 1), r"Color must be an RGB triplet if set to a tuple type"),
-            ((1, "a", 1), r"Could not transform \(1, 'a', 1\) into a Color object"),
-            ((1.1, 1.0, 1.0), r"Expected red channel to be in the inclusive range of 0.0 and 1.0"),
-            ((1.0, 1.1, 1.0), r"Expected green channel to be in the inclusive range of 0.0 and 1.0"),
-            ((1.0, 1.0, 1.1), r"Expected blue channel to be in the inclusive range of 0.0 and 1.0"),
-            ((), r"Color must be an RGB triplet if set to a tuple type"),
-            ({}, r"Could not transform \{\} into a Color object"),
-            ([], r"Color must be an RGB triplet if set to a list type"),
-            ({1, 1, 1}, r"Could not transform \{1\} into a Color object"),
-            (set(), r"Could not transform set\(\) into a Color object"),
-            (b"1ff1ff", r"Could not transform b'1ff1ff' into a Color object"),
-            *tuple_str_sad_test_data,
-        ],
-    )
+    @pytest.mark.parametrize(("input_string", "value_error_match"), [("blah", r"Could not transform 'blah' into a Color object"), ("0xfff1", r"Color code is invalid length\. Must be 3 or 6 digits"), (lambda: 22, r"Could not transform <function TestColor\.<lambda> at 0x[a-zA-Z0-9]+> into a Color object"), (NotImplementedError, r"Could not transform <class 'NotImplementedError'> into a Color object"), (NotImplemented, r"Could not transform NotImplemented into a Color object"), ((1, 1, 1, 1), r"Color must be an RGB triplet if set to a tuple type"), ((1, "a", 1), r"Could not transform \(1, 'a', 1\) into a Color object"), ((1.1, 1.0, 1.0), r"Expected red channel to be in the inclusive range of 0.0 and 1.0"), ((1.0, 1.1, 1.0), r"Expected green channel to be in the inclusive range of 0.0 and 1.0"), ((1.0, 1.0, 1.1), r"Expected blue channel to be in the inclusive range of 0.0 and 1.0"), ((), r"Color must be an RGB triplet if set to a tuple type"), ({}, r"Could not transform \{\} into a Color object"), ([], r"Color must be an RGB triplet if set to a list type"), ({1}, r"Could not transform \{1\} into a Color object"), (set(), r"Could not transform set\(\) into a Color object"), (b"1ff1ff", r"Could not transform b'1ff1ff' into a Color object"), *tuple_str_sad_test_data])
     def test_Color_of_sad_path(self, input_string, value_error_match):
         with pytest.raises(ValueError, match=value_error_match):
             colors.Color.of(input_string)

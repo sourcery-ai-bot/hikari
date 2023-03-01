@@ -132,8 +132,8 @@ isinstance_long = Valid()
 isinstance_failfast = Invalid()
 
 # Dummy work to churn the CPU up.
-for i in range(100_000):
-    assert sum(i for i in range(10)) > 0
+for _ in range(100_000):
+    assert sum(range(10)) > 0
 
 py_protocol_isinstance_long_time = timeit.timeit(
     "isinstance(isinstance_long, BasicPyProtocol)",

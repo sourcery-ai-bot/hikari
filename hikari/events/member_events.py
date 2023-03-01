@@ -80,10 +80,12 @@ class MemberEvent(shard_events.ShardEvent, abc.ABC):
             The guild that this event occurred in, if known, else
             `None`.
         """
-        if not isinstance(self.app, traits.CacheAware):
-            return None
-
-        return self.app.cache.get_available_guild(self.guild_id) or self.app.cache.get_unavailable_guild(self.guild_id)
+        return (
+            self.app.cache.get_available_guild(self.guild_id)
+            or self.app.cache.get_unavailable_guild(self.guild_id)
+            if isinstance(self.app, traits.CacheAware)
+            else None
+        )
 
 
 @attr_extensions.with_copy

@@ -326,8 +326,8 @@ def to_data_uri(data: bytes, mimetype: typing.Optional[str]) -> str:
     if mimetype is None:
         mimetype = guess_mimetype_from_data(data)
 
-        if mimetype is None:
-            raise TypeError("Cannot infer mimetype from input data, specify it manually.")
+    if mimetype is None:
+        raise TypeError("Cannot infer mimetype from input data, specify it manually.")
 
     b64 = base64.b64encode(data).decode()
     return f"data:{mimetype};base64,{b64}"
@@ -559,9 +559,7 @@ class Resource(typing.Generic[ReaderImplT], abc.ABC):
         return f"{type(self).__name__}(url={self.url!r}, filename={self.filename!r})"
 
     def __eq__(self, other: typing.Any) -> bool:
-        if isinstance(other, Resource):
-            return self.url == other.url
-        return False
+        return self.url == other.url if isinstance(other, Resource) else False
 
     def __hash__(self) -> int:
         return hash((self.__class__, self.url))
@@ -633,33 +631,32 @@ class _WebReaderAsyncReaderContextManagerImpl(AsyncReaderContextManager[WebReade
         try:
             resp: aiohttp.ClientResponse = await ctx.__aenter__()
 
-            if 200 <= resp.status < 400:
-                mimetype = None
-                filename = self._web_resource.filename
-
-                if resp.content_disposition is not None:
-                    mimetype = resp.content_disposition.type
-
-                if mimetype is None:
-                    mimetype = resp.content_type
-
-                self._client_response_ctx = ctx
-                self._client_session = client_session
-
-                return WebReader(
-                    stream=resp.content,
-                    url=str(resp.real_url),
-                    status=resp.status,
-                    reason=str(resp.reason),
-                    filename=filename,
-                    charset=resp.charset,
-                    mimetype=mimetype,
-                    size=resp.content_length,
-                    head_only=self._head_only,
-                )
-            else:
+            if not 200 <= resp.status < 400:
                 raise await net.generate_error_response(resp)
 
+            mimetype = None
+            filename = self._web_resource.filename
+
+            if resp.content_disposition is not None:
+                mimetype = resp.content_disposition.type
+
+            if mimetype is None:
+                mimetype = resp.content_type
+
+            self._client_response_ctx = ctx
+            self._client_session = client_session
+
+            return WebReader(
+                stream=resp.content,
+                url=str(resp.real_url),
+                status=resp.status,
+                reason=str(resp.reason),
+                filename=filename,
+                charset=resp.charset,
+                mimetype=mimetype,
+                size=resp.content_length,
+                head_only=self._head_only,
+            )
         except Exception as ex:
             await ctx.__aexit__(type(ex), ex, ex.__traceback__)
             await client_session.close()
@@ -918,12 +915,9 @@ class File(Resource[ThreadedFileReader]):
 
     @property
     def filename(self) -> str:
-        filename = self._filename if self._filename else self.path.name
+        filename = self._filename or self.path.name
 
-        if self.is_spoiler:
-            return SPOILER_TAG + filename
-
-        return filename
+        return SPOILER_TAG + filename if self.is_spoiler else filename
 
     def stream(
         self,
@@ -1116,10 +1110,7 @@ class Bytes(Resource[IteratorReader]):
 
     @property
     def filename(self) -> str:
-        if self.is_spoiler:
-            return SPOILER_TAG + self._filename
-
-        return self._filename
+        return SPOILER_TAG + self._filename if self.is_spoiler else self._filename
 
     def stream(
         self,

@@ -203,13 +203,13 @@ class TestCDNRoute:
 
     @pytest.mark.parametrize("size", [int(2**size) for size in [1, *range(17, 25)]])
     def test_passing_invalid_magnitude_sizes_to_sizable_raises_ValueError(self, size):
-        route = routes.CDNRoute("/foo/bar", {"png", "jpg", "png"}, is_sizable=True)
+        route = routes.CDNRoute("/foo/bar", {"jpg", "png"}, is_sizable=True)
         with pytest.raises(ValueError, match="size must be an integer power of 2 between 16 and 4096 inclusive"):
             route.compile("http://example.com", file_format="png", hash="boooob", size=size)
 
     @pytest.mark.parametrize("size", [*range(-10, 0)])
     def test_passing_negative_sizes_to_sizable_raises_ValueError(self, size):
-        route = routes.CDNRoute("/foo/bar", {"png", "jpg", "png"}, is_sizable=True)
+        route = routes.CDNRoute("/foo/bar", {"jpg", "png"}, is_sizable=True)
         with pytest.raises(ValueError, match="size must be positive"):
             route.compile("http://example.com", file_format="png", hash="boooob", size=size)
 

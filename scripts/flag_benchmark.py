@@ -93,8 +93,8 @@ else:
 for i in range(5):
     print("pass", i + 1)
 
-    for j in range(1_000_000):
-        if sum(j for j in range(10)) < 0:
+    for _ in range(1_000_000):
+        if sum(range(10)) < 0:
             raise RuntimeError
 
     py_intflag_call_time_member = timeit.timeit(
@@ -104,8 +104,8 @@ for i in range(5):
         setup="build_enums()", stmt="HikariIntFlag(4)", number=10_000_000, globals=globals()
     )
 
-    for j in range(1_000_000):
-        if sum(j for j in range(10)) < 0:
+    for _ in range(1_000_000):
+        if sum(range(10)) < 0:
             raise RuntimeError
 
     py_intflag_call_time_existing_composite = (
@@ -115,8 +115,8 @@ for i in range(5):
         timeit.timeit(stmt="HikariIntFlag(71)", number=10_000_000, globals=globals()) / 10
     )
 
-    for j in range(1_000_000):
-        if sum(j for j in range(10)) < 0:
+    for _ in range(1_000_000):
+        if sum(range(10)) < 0:
             raise RuntimeError
 
     build_enums_time = timeit.timeit(stmt="build_enums()", number=10_000, globals=globals())
@@ -127,8 +127,8 @@ for i in range(5):
     py_intflag_call_time_new_composite -= build_enums_time
     py_intflag_call_time_new_composite *= 100
 
-    for j in range(1_000_000):
-        if sum(j for j in range(10)) < 0:
+    for _ in range(1_000_000):
+        if sum(range(10)) < 0:
             raise RuntimeError
 
     build_enums_time = timeit.timeit(stmt="build_enums()", number=10_000, globals=globals())

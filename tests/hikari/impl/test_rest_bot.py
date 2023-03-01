@@ -301,7 +301,7 @@ class TestRESTBot:
         mock_interaction_server.close.assert_awaited_once()
         mock_rest_client.close.assert_awaited_once()
         close_event.set.assert_called_once()
-        assert mock_rest_bot._is_closing is False
+        assert not mock_rest_bot._is_closing
         mock_shutdown_1.assert_awaited_once_with(mock_rest_bot)
         mock_shutdown_2.assert_awaited_once_with(mock_rest_bot)
 
@@ -325,7 +325,7 @@ class TestRESTBot:
         mock_interaction_server.close.assert_awaited_once()
         mock_rest_client.close.assert_awaited_once()
         close_event.set.assert_called_once()
-        assert mock_rest_bot._is_closing is False
+        assert not mock_rest_bot._is_closing
         mock_shutdown_1.assert_awaited_once_with(mock_rest_bot)
         mock_shutdown_2.assert_not_called()
 
@@ -348,7 +348,7 @@ class TestRESTBot:
         mock_rest_client.close.assert_not_called()
         mock_rest_bot._close_event.set.assert_not_called()
         mock_rest_bot.join.assert_awaited_once()
-        assert mock_rest_bot._is_closing is True
+        assert mock_rest_bot._is_closing
         mock_shutdown_1.assert_not_called()
         mock_shutdown_2.assert_not_called()
 
@@ -574,7 +574,7 @@ class TestRESTBot:
         )
         mock_rest_client.start.assert_called_once_with()
         mock_rest_client.close.assert_not_called()
-        assert mock_rest_bot._is_closing is False
+        assert not mock_rest_bot._is_closing
         mock_callback_1.assert_awaited_once_with(mock_rest_bot)
         mock_callback_2.assert_awaited_once_with(mock_rest_bot)
 
@@ -612,7 +612,7 @@ class TestRESTBot:
         mock_interaction_server.start.assert_not_called()
         mock_rest_client.start.assert_called_once_with()
         mock_rest_client.close.assert_awaited_once_with()
-        assert mock_rest_bot._is_closing is False
+        assert not mock_rest_bot._is_closing
         mock_callback_1.assert_awaited_once_with(mock_rest_bot)
         mock_callback_2.assert_not_called()
 

@@ -81,7 +81,7 @@ def slow_iso8601_datetime_string_to_datetime(datetime_str: str) -> datetime.date
     """
     if datetime_str.endswith(("z", "Z")):
         # Python's parser cannot handle zulu time, it isn't a proper ISO-8601 compliant parser.
-        datetime_str = datetime_str[:-1] + "+00:00"
+        datetime_str = f"{datetime_str[:-1]}+00:00"
     return datetime.datetime.fromisoformat(datetime_str)
 
 
@@ -164,10 +164,7 @@ def unix_epoch_to_datetime(epoch: typing.Union[int, float], /, *, is_millis: boo
         epoch /= (is_millis * 1_000) or 1
         return datetime.datetime.fromtimestamp(epoch, datetime.timezone.utc)
     except (OSError, ValueError):
-        if epoch > 0:
-            return datetime.datetime.max
-        else:
-            return datetime.datetime.min
+        return datetime.datetime.max if epoch > 0 else datetime.datetime.min
 
 
 def timespan_to_int(value: Intervalish, /) -> int:

@@ -244,15 +244,13 @@ class TestEnum:
         assert Enum.foo.name == "foo"
 
     def test_iter(self):
+
         class Enum(int, enums.Enum):
             foo = 9
             bar = 18
             baz = 27
 
-        a = []
-        for i in Enum:
-            a.append(i)
-
+        a = list(Enum)
         assert a == [Enum.foo, Enum.bar, Enum.baz]
 
     def test_repr(self):

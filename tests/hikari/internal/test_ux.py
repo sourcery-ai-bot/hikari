@@ -342,10 +342,7 @@ class TestPrintBanner:
             "python_implementation": "CPython",
             "python_version": "4.0.0",
             "system_description": "Machine Potato 1.0.0",
-        }
-
-        args.update(extra_args)
-
+        } | extra_args
         read_banner.assert_called_once_with("hikaru")
         template.assert_called_once_with(read_banner.return_value)
         template().safe_substitute.assert_called_once_with(args)

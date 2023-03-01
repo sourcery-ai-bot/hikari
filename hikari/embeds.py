@@ -605,7 +605,7 @@ class Embed:
             Use `add_field` to add a new field, `edit_field` to edit an existing
             field, or `remove_field` to remove a field.
         """
-        return self._fields if self._fields else []
+        return self._fields or []
 
     def set_author(
         self,

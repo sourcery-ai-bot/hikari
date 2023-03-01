@@ -373,11 +373,10 @@ class EventManagerBase(event_manager_.EventManager):
                 consumer.waiter_group_count += count
 
     def _enabled_for_event(self, event_type: typing.Type[base_events.Event], /) -> bool:
-        for cls in event_type.dispatches():
-            if cls in self._listeners or cls in self._waiters:
-                return True
-
-        return False
+        return any(
+            cls in self._listeners or cls in self._waiters
+            for cls in event_type.dispatches()
+        )
 
     def _check_event(self, event_type: typing.Type[typing.Any], nested: int) -> None:
         try:
@@ -388,11 +387,9 @@ class EventManagerBase(event_manager_.EventManager):
         if not is_event:
             raise TypeError("'event_type' is a non-Event type")
 
-        # Collection of combined bitfield combinations of intents that
-        # could be enabled to receive this event.
-        expected_intent_groups = base_events.get_required_intents_for(event_type)
-
-        if expected_intent_groups:
+        if expected_intent_groups := base_events.get_required_intents_for(
+            event_type
+        ):
             for expected_intent_group in expected_intent_groups:
                 if (self._intents & expected_intent_group) == expected_intent_group:
                     break
@@ -462,10 +459,7 @@ class EventManagerBase(event_manager_.EventManager):
 
             return listeners
 
-        if items := self._listeners.get(event_type):
-            return items.copy()
-
-        return ()
+        return items.copy() if (items := self._listeners.get(event_type)) else ()
 
     # Yes, this is not generic. The reason for this is MyPy complains about
     # using ABCs that are not concrete in generic types passed to functions.

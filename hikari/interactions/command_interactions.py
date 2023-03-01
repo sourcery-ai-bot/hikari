@@ -342,10 +342,11 @@ class BaseCommandInteraction(base_interactions.PartialInteraction):
         hikari.errors.InternalServerError
             If an internal error occurs on Discord while handling the request.
         """
-        if not self.guild_id:
-            return None
-
-        return await self.app.rest.fetch_guild(self.guild_id)
+        return (
+            await self.app.rest.fetch_guild(self.guild_id)
+            if self.guild_id
+            else None
+        )
 
     def get_guild(self) -> typing.Optional[guilds.GatewayGuild]:
         """Get the object of this interaction's guild guild from the cache.

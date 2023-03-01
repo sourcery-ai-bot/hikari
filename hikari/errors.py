@@ -243,17 +243,13 @@ class HTTPResponseError(HTTPError):
         else:
             name_value = f"Unknown Status {self.status}"
 
-        if self.code:
-            code_str = f" ({self.code})"
-        else:
-            code_str = ""
-
+        code_str = f" ({self.code})" if self.code else ""
         if self.message:
             body = self.message
         else:
             try:
                 body = self.raw_body.decode("utf-8")
-            except (AttributeError, UnicodeDecodeError, TypeError, ValueError):
+            except (AttributeError, TypeError, ValueError):
                 body = str(self.raw_body)
 
         chomped = len(body) > 200

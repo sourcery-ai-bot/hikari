@@ -31,16 +31,16 @@ from hikari import users
 def assert_objects_equal(a, b):
     assert a == b
     assert b == a
-    assert not a != b
-    assert not b != a
+    assert a == b
+    assert b == a
     assert hash(a) == hash(b)
 
 
 def assert_objects_not_equal(a, b):
     assert a != b
     assert b != a
-    assert not a == b
-    assert not b == a
+    assert a != b
+    assert b != a
 
 
 def make_user(user_id, username):

@@ -734,7 +734,11 @@ class EventFactoryImpl(event_factory.EventFactory):
         raw_emoji_id = emoji_payload.get("id")
         emoji_id = snowflakes.Snowflake(raw_emoji_id) if raw_emoji_id else None
         is_animated = bool(emoji_payload.get("animated", False))
-        emoji_name = emojis_models.UnicodeEmoji(emoji_payload["name"]) if not emoji_id else emoji_payload["name"]
+        emoji_name = (
+            emoji_payload["name"]
+            if emoji_id
+            else emojis_models.UnicodeEmoji(emoji_payload["name"])
+        )
 
         if "member" in payload:
             guild_id = snowflakes.Snowflake(payload["guild_id"])

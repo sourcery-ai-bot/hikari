@@ -35,7 +35,7 @@ def _to_rgb_int(value: str, name: str) -> int:
     # Heavy validation that is user-friendly and doesn't allow exploiting overflows, etc easily.
     #
     # isdigit allows chars like ² according to the docs.
-    if not all(c in string.digits for c in value):
+    if any(c not in string.digits for c in value):
         raise ValueError(f"Expected digits only for {name} channel")
     if not value or len(value) > 3:
         raise ValueError(f"Expected 1 to 3 digits for {name} channel, got {len(value)}")
@@ -162,7 +162,7 @@ class Color(int):
 
     def __init__(self, raw_rgb: typing.SupportsInt) -> None:
         if not (0 <= int(raw_rgb) <= 0xFFFFFF):
-            raise ValueError(f"raw_rgb must be in the exclusive range of 0 and {0xFF_FF_FF}")
+            raise ValueError('raw_rgb must be in the exclusive range of 0 and 16777215')
         # The __new__ for `int` initializes the value for us, this super-call does nothing other
         # than keeping the linter happy.
         super().__init__()
@@ -210,7 +210,7 @@ class Color(int):
         --------
         `#1A2B3C`
         """
-        return "#" + self.raw_hex_code
+        return f"#{self.raw_hex_code}"
 
     @property
     def raw_hex_code(self) -> str:
@@ -324,7 +324,7 @@ class Color(int):
         elif hex_code.startswith(("0x", "0X")):
             hex_code = hex_code[2:]
 
-        if not all(c in string.hexdigits for c in hex_code):
+        if any(c not in string.hexdigits for c in hex_code):
             raise ValueError("Color code must be hexadecimal")
 
         if len(hex_code) == 3:
@@ -501,7 +501,9 @@ class Color(int):
                 return cls.from_tuple_string(value)
 
             is_start_hash_or_hex_literal = value.casefold().startswith(("#", "0x"))
-            is_hex_digits = all(c in string.hexdigits for c in value) and len(value) in (3, 6)
+            is_hex_digits = all(c in string.hexdigits for c in value) and len(
+                value
+            ) in {3, 6}
             if is_start_hash_or_hex_literal or is_hex_digits:
                 return cls.from_hex_code(value)
 

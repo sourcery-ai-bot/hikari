@@ -66,8 +66,8 @@ def remove_trailing_whitespaces(session: nox.Session, check_only: bool = False) 
 
     end = time.perf_counter()
 
-    remark = "Good job! " if not count else ""
-    message = "Had to fix" if not check_only else "Found issues in"
+    remark = "" if count else "Good job! "
+    message = "Found issues in" if check_only else "Had to fix"
     call = session.error if check_only and count else session.log
 
     call(

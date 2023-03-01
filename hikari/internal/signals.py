@@ -121,9 +121,6 @@ def handle_interrupts(
 
     finally:
         for sig in _INTERRUPT_SIGNALS:
-            try:
+            with contextlib.suppress(AttributeError):
                 signum = getattr(signal, sig)
                 signal.signal(signum, signal.SIG_DFL)
-            except AttributeError:
-                # Signal not implemented. We already logged this earlier.
-                pass

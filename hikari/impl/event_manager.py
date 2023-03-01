@@ -641,10 +641,7 @@ class EventManagerImpl(event_manager_base.EventManagerBase):
     @event_manager_base.filtered(channel_events.InviteDeleteEvent, config.CacheComponents.INVITES)
     async def on_invite_delete(self, shard: gateway_shard.GatewayShard, payload: data_binding.JSONObject) -> None:
         """See https://discord.com/developers/docs/topics/gateway-events#invite-delete for more info."""
-        old: typing.Optional[invites.InviteWithMetadata] = None
-        if self._cache:
-            old = self._cache.delete_invite(payload["code"])
-
+        old = self._cache.delete_invite(payload["code"]) if self._cache else None
         event = self._event_factory.deserialize_invite_delete_event(shard, payload, old_invite=old)
 
         await self.dispatch(event)

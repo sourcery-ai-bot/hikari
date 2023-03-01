@@ -97,7 +97,7 @@ class TestStringMapBuilder:
     def test_put_undefined(self):
         mapping = data_binding.StringMapBuilder()
         mapping.put("foo", undefined.UNDEFINED)
-        assert dict(mapping) == {}
+        assert not dict(mapping)
 
     def test_put_general_value_casts_to_str(self):
         m = mock.Mock()
